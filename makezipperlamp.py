@@ -48,6 +48,7 @@ def laydownSurface(bs, ind):
 	print(lname)
 	rs.AddLayer(lname)
 	rs.CurrentLayer(lname)
+
 	result = rs.UnrollSurface(bs, False, associated_edges[bs])
 
 	face = result[0]
@@ -73,8 +74,16 @@ def laydownSurface(bs, ind):
 	completed_pieces.append(cp[0])
 
 def makeZipper(e, cen, face, direction, len3d):
-	segs = int(len3d)*5
-	params = rs.DivideCurve(e, segs, False, False)
+	glen = 0.25
+	len2d = rs.CurveLength(e)
+	gcnt = int(len3d/glen)
+	segs = len3d/(gcnt*1.0)
+	params = rs.DivideCurveEquidistant(e, segs, False, False)
+	dom = rs.CurveDomain(e)[1]
+	if params[-1] < dom : 
+		params.append(dom) # we're dropping the last tooth sometimes :(
+		print("last was "+str(params[-2]))
+		print("new is "+str(params[-1]))
 
 	rs.SelectObject(e)
 
@@ -95,6 +104,7 @@ def makeZipper(e, cen, face, direction, len3d):
 		tan = rs.CurveTangent(e, pm)
 		norm = rs.VectorRotate(tan, 90, [0,0,1])*os
 		os_pt = pt+norm
+		test_pt = pt+norm*0.1
 
 		pt0 = rs.EvaluateCurve(e, p0)
 		tan0 = rs.CurveTangent(e, p0)
@@ -106,7 +116,7 @@ def makeZipper(e, cen, face, direction, len3d):
 		norm1 = rs.VectorRotate(tan, 90, [0,0,1])*os
 		os_pt1 = pt1+norm1
 		
-		if rs.IsPointOnSurface(face,os_pt):
+		if rs.IsPointOnSurface(face,test_pt):
 			norm = rs.VectorReverse(norm)
 			os_pt = pt + norm
 
