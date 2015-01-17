@@ -76,8 +76,8 @@ def laydownSurface(bs, ind):
 def makeZipper(e, cen, face, direction, len3d):
 	glen = 0.25
 	len2d = rs.CurveLength(e)
-	gcnt = int(len3d/glen)
-	segs = len3d/(gcnt*1.0)
+	gcnt = int(len2d/glen)
+	segs = len2d/(gcnt*1.0)
 	params = rs.DivideCurveEquidistant(e, segs, False, False)
 	dom = rs.CurveDomain(e)[1]
 	if params[-1] < dom : 
